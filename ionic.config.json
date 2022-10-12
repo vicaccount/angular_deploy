@@ -1,0 +1,7 @@
+{
+  "name": "api-instagram",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
