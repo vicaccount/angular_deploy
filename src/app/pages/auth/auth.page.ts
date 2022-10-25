@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -9,17 +9,23 @@ import { AuthService } from '../../services/auth.service';
 })
 export class AuthPage implements OnInit {
 
-  constructor(private activeRoute: ActivatedRoute, private servicioAuth: AuthService) { }
+  public urlAuth = '';
+
+  constructor
+    (
+      private activeRoute: ActivatedRoute,
+      private servicioAuth: AuthService
+    ) {
+    this.urlAuth = this.servicioAuth.authenticationUrl;
+    console.log(this.urlAuth);
+  }
 
   ngOnInit() {
-    this.activeRoute.queryParams.subscribe(params=>{
-      console.log(params);
-
-      const codigo = params.code;
-
-      if(!codigo){
-        this.servicioAuth.getInstagramToken(codigo).subscribe(resp=>{
-          console.log(resp);
+    this.activeRoute.queryParams.subscribe((params: Params) => {
+      console.log('Parámetros ', params);
+      if (params.code) {
+        this.servicioAuth.getAccessId(params.code).subscribe((resp) => {
+          console.log('Access token ', resp);
         });
       }
     });

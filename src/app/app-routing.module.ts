@@ -8,7 +8,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'auth-facebook',
     pathMatch: 'full'
   },
   {
@@ -18,6 +18,18 @@ const routes: Routes = [
   {
     path: 'prueba',
     loadChildren: () => import('./prueba/prueba.module').then( m => m.PruebaPageModule)
+  },
+  {
+    path: 'auth-facebook',
+    loadChildren: () => import('./pages/auth-facebook/auth-facebook.module').then( m => m.AuthFacebookPageModule)
+  },
+  {
+    path: 'auth-twitter',
+    loadChildren: () => import('./pages/auth-twitter/auth-twitter.module').then( m => m.AuthTwitterPageModule)
+  },
+  {
+    path: 'privacy-policy',
+    loadChildren: () => import('./pages/privacy-policy/privacy-policy.module').then( m => m.PrivacyPolicyPageModule)
   },
 ];
 
