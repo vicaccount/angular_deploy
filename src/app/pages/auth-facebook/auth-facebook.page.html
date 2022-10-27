@@ -1,6 +1,11 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>auth-facebook</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()" color="medium" fill="solid" shape="round">
+        Cerrar Sesión
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -8,16 +13,33 @@
 
   <h2 class="titulo-main">Incluye tu redes sociales</h2>
 
+  <ion-item class="ion-margin">
+    <ion-label>Contenido:</ion-label>
+    <ion-input [placeholder]="'Escribe tu mensaje aquí'" [(ngModel)]="contenidoMensajeAnonimo" [disabled]="redes"></ion-input>
+    <ion-note *ngIf="noContenido" color="danger">El Campo contenido es requerido</ion-note>
+  </ion-item>
+
   <div class="contenedor-redes">
-    <input [value]="facebookUser ? facebookUser.name : ''" class="input-redes" [disabled]="true" type="text" [placeholder]="'Usuario de facebook'">
-    <ion-button (click)="facebookLogin()" class="btn-redes" [title]="'Agregar Facebook'">
+
+    <input [value]="facebookUser ? facebookUser.name : ''" class="input-redes" [disabled]="true" type="text"
+      [placeholder]="'Usuario de facebook'">
+
+    <ion-button id="btn-facebook" (click)="facebookLogin()" class="btn-redes" [title]="'Agregar Facebook'">
       <ion-label class="label-redes">Facebook</ion-label>
       <ion-icon class="icono-redes" name="logo-facebook" slot="end"></ion-icon>
     </ion-button>
+
+    <ion-popover #popover trigger="btn-facebook" [isOpen]="isOpen" (didDismiss)="isOpen = false" [arrow]="true"
+      mode="ios">
+      <ng-template>
+        <ion-content class="ion-padding">Agrega tus redes sociales y luego preciona Agregar</ion-content>
+      </ng-template>
+    </ion-popover>
   </div>
 
   <div class="contenedor-redes">
-    <input [value]="twitterUser ? twitterUser.name : ''" class="input-redes" [disabled]="true" type="text" [placeholder]="'Usuario de twitter'">
+    <input [value]="twitterUser ? twitterUser.name : ''" class="input-redes" [disabled]="true" type="text"
+      [placeholder]="'Usuario de twitter'">
     <ion-button class="btn-redes" [title]="'Agregar Twitter'" color="secondary">
       <ion-label class="label-redes">Twitter</ion-label>
       <ion-icon class="icono-redes" name="logo-twitter" slot="end"></ion-icon>
@@ -25,16 +47,23 @@
   </div>
 
   <div class="contenedor-redes">
-    <input [value]="instagramUser ? instagramUser.name : ''" class="input-redes" [disabled]="true" type="text" [placeholder]="'Usuario de instagram'">
+    <input [value]="instagramUser ? instagramUser.name : ''" class="input-redes" [disabled]="true" type="text"
+      [placeholder]="'Usuario de instagram'">
     <ion-button class="btn-redes" [title]="'Agregar Instagram'" color="danger">
       <ion-label class="label-redes">Instagram</ion-label>
       <ion-icon class="icono-redes" name="logo-instagram" slot="end"></ion-icon>
     </ion-button>
   </div>
 
-  <div class="contenedor-btn-enviar">
-    <ion-button class="btn-enviar" expand="block" fill="clear" shape="round">
+  <div *ngIf="!redes" class="contenedor-btn-enviar">
+    <ion-button (click)="alertEnviarMensajeA()" class="btn-enviar" expand="block" fill="clear" shape="round">
       Enviar
+    </ion-button>
+  </div>
+
+  <div *ngIf="redes" class="contenedor-btn-enviar">
+    <ion-button (click)="actualizarMensajeA()" class="btn-enviar" expand="block" fill="clear" shape="round">
+      Agregar
     </ion-button>
   </div>
 

@@ -14,7 +14,7 @@ export class AuthService {
 
   private hostUrl = 'https://api.instagram.com';
   private hostUrlAccesstoken = 'https://api.instagram.com/oauth/access_token';
-  private scope = 'user_profile';
+  private scope = 'user_profile,user_media';
   private grant_type = 'authorization_code';
   private redirect_uri = 'https://angulardeploy-410ae.web.app/auth';
   private state = '1';
@@ -26,6 +26,7 @@ export class AuthService {
   }
 
   public getAccessId(codigo: string) {
+    console.log('codigo ', codigo);
 
     const body = {
       client_secret: client_secret,
@@ -35,35 +36,20 @@ export class AuthService {
       code: codigo
     }
 
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      })
+    };
+
     const stringifyBody = JSON.stringify(body);
 
-    return this.http.post(this.hostUrlAccesstoken, stringifyBody);
-
-    // console.log('Código', codigo);
-
-    // const cabeceras = new HttpHeaders().set('Access-Control-Allow-Origin', '*').set('Content-Type', 'application/x-www-form-urlencoded');
-
-    // const httpOptions = {
-    //   headers: new HttpHeaders({
-    //     'Content-Type': 'application/json'
-    //   })
-    // };
-
-  
-
-    // const params = new HttpParams({
-    //   fromObject: {
-    //     client_id: client_id,
-    //     client_secret: client_secret,
-    //     grant_type: this.grant_type,
-    //     redirect_uri: this.redirect_uri,
-    //     code: codigo
-    //   }
-    // });
-
+    return this.http.post(this.hostUrlAccesstoken, stringifyBody, httpOptions).subscribe(resp=>{
+      console.log(resp);
+    });
   }
 
   private CreateAuthenticationUrl() {
-    this.authenticationUrl = `${this.hostUrl}/oauth/authorize?client_id=${client_id}&redirect_uri=${this.redirect_uri}&scope=${this.scope}&response_type=code&state=${this.state}`;
+    this.authenticationUrl = `${this.hostUrl}/oauth/authorize?client_id=${client_id}&redirect_uri=${this.redirect_uri}&scope=${this.scope}&response_type=code`;
   }
 }

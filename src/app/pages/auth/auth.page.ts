@@ -10,6 +10,8 @@ import { AuthService } from '../../services/auth.service';
 export class AuthPage implements OnInit {
 
   public urlAuth = '';
+  public code = '';
+  public token = '';
 
   constructor
     (
@@ -24,9 +26,8 @@ export class AuthPage implements OnInit {
     this.activeRoute.queryParams.subscribe((params: Params) => {
       console.log('Parámetros ', params);
       if (params.code) {
-        this.servicioAuth.getAccessId(params.code).subscribe((resp) => {
-          console.log('Access token ', resp);
-        });
+        this.code = params.code;
+        // this.servicioAuth.getAccessId(params.code);
       }
     });
   }

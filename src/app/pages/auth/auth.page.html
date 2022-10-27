@@ -8,4 +8,11 @@
     <ion-button [href]="urlAuth" color="danger">
       Registrar con Instagram
     </ion-button>
+
+    <p>Url: {{urlAuth}}</p>
+
+    <p *ngIf="code" class="ion-margin">Code: {{code}}</p>
+
+    <p *ngIf="token" class="ion-margin">token: {{token}}</p>
+
 </ion-content>

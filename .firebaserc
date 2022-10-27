@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "angulardeploy-410ae"
+  },
+  "targets": {
+    "angulardeploy-410ae": {
+      "hosting": {
+        "app": [
+          "angulardeploy-410ae"
+        ]
+      }
+    }
   }
 }
