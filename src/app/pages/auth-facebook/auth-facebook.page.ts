@@ -3,7 +3,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { IMensajeAnonimo } from '../../interfaces/mensaje-anonimo';
 import { MensajeAnonimoService } from '../../services/mensaje-anonimo.service';
 import { AlertController, PopoverController, ToastController } from '@ionic/angular';
-import { DocumentReference } from '@angular/fire/firestore';
 @Component({
   selector: 'app-auth-facebook',
   templateUrl: './auth-facebook.page.html',
@@ -12,12 +11,11 @@ import { DocumentReference } from '@angular/fire/firestore';
 
 export class AuthFacebookPage implements OnInit {
 
-  @ViewChild('popover') popover;
+  public avisoRedes: HTMLDivElement;
   public twitterUser: any;
   public facebookUser: any;
   public instagramUser: any;
   public contenidoMensajeAnonimo: string = '';
-  public isOpen = false;
   public redes = false;
   public noContenido = false;
   private UltimoMensajeId = '';
@@ -29,16 +27,13 @@ export class AuthFacebookPage implements OnInit {
       private servicioMensajeA: MensajeAnonimoService,
       private alertController: AlertController,
       private toastController: ToastController,
-      public popoverController: PopoverController
     ) { }
 
   ngOnInit() {
-
+    this.avisoRedes = document.getElementById('aviso-redes') as HTMLDivElement;
   }
 
   facebookLogin(): void {
-
-    this.isOpen = false;
 
     if (!this.facebookUser) {
       this.authService.signIn(FacebookLoginProvider.PROVIDER_ID).then((resp) => {
@@ -52,6 +47,7 @@ export class AuthFacebookPage implements OnInit {
 
   logout(): void {
     if (this.facebookUser) {
+      this.facebookUser = null;
       this.authService.signOut().then((resp) => {
         console.log('logout', resp)
       }).catch(() => { });
@@ -62,7 +58,7 @@ export class AuthFacebookPage implements OnInit {
 
   enviarMensajeA() {
 
-    const mensajesAnonimo: IMensajeAnonimo = {
+    const mensajeAnonimo: IMensajeAnonimo = {
       idAutor: '',
       idDestinatario: 'U5u9aGm6dSWQQL5sOEsufMCCo383',
       usuarioFacebook: this.facebookUser ? this.facebookUser.name : '',
@@ -72,7 +68,7 @@ export class AuthFacebookPage implements OnInit {
       fechaCreacion: new Date().getTime()
     }
 
-    this.servicioMensajeA.addMensajeAnonimo(mensajesAnonimo).then((resp) => {
+    this.servicioMensajeA.addMensajeAnonimo(mensajeAnonimo).then((resp) => {
       this.toastMensajeAEnviado().then(() => {
         console.log(resp);
         this.noContenido = false;
@@ -80,11 +76,11 @@ export class AuthFacebookPage implements OnInit {
         this.UltimoMensajeId = resp.id;
         console.log('Id del último mensaje ', this.UltimoMensajeId);
 
-        if (mensajesAnonimo.usuarioFacebook == '' && mensajesAnonimo.usuarioTwitter == '' && mensajesAnonimo.usuarioInstagram == '') {
-          // alert('Si te logueas es posible que recibas una respuesta del creador');
+        if (mensajeAnonimo.usuarioFacebook == '' && mensajeAnonimo.usuarioTwitter == '' && mensajeAnonimo.usuarioInstagram == '') {
           this.alertNoLogin();
+          this.contenidoMensajeAnonimo = mensajeAnonimo.contenido;
         } else {
-          this.facebookUser, this.twitterUser, this.instagramUser = null;
+          this.logout();
         }
       });
     }).catch((e) => {
@@ -92,7 +88,7 @@ export class AuthFacebookPage implements OnInit {
     });
   }
 
-  actualizarMensajeA() {
+  public actualizarMensajeA() {
     this.redes = true;
     const userNameF = this.facebookUser ? this.facebookUser.name : '';
     const userNameT = this.twitterUser ? this.twitterUser.name : '';
@@ -101,10 +97,15 @@ export class AuthFacebookPage implements OnInit {
     if (this.facebookUser || this.twitterUser || this.instagramUser) {
       this.servicioMensajeA.updateMensajeAnonimo(this.UltimoMensajeId, userNameF, userNameT, userNameI).then(() => {
         this.redes = false;
+        this.contenidoMensajeAnonimo = '';
+        this.logout();
         this.toastRedesAgregadas();
       });
     } else {
-      this.isOpen = true;
+      this.avisoRedes.style.animationPlayState = 'running';
+      setTimeout(() => {
+        this.avisoRedes.style.animationPlayState = 'paused';
+      }, 1000);
     }
   }
 
@@ -112,7 +113,7 @@ export class AuthFacebookPage implements OnInit {
   // Alerts
   public async alertEnviarMensajeA() {
 
-    if(this.contenidoMensajeAnonimo === ''){
+    if (this.contenidoMensajeAnonimo === '') {
       this.noContenido = true;
       return
     }
@@ -141,24 +142,29 @@ export class AuthFacebookPage implements OnInit {
 
     const alert = await this.alertController.create({
       header: 'No has agregado tus redes',
-      message: 'Si Inicias sesión con alguna red social podrás recibir una respuesta de creador ¿Quieres agregar alguna red social al mensaje que acabas de enviar?',
+      message: `Si Inicias sesión con alguna red social podrás recibir una respuesta del creador.
+       ¿Quieres agregar alguna red social al mensaje que acabas de enviar?`,
       backdropDismiss: true,
       buttons: [
         {
           text: 'No gracias',
-          role: 'cancel'
+          role: 'cancel',
+          handler: ()=>{
+            this.contenidoMensajeAnonimo = '';
+          }
         },
         {
           text: 'Sí',
           handler: () => {
-            this.isOpen = true;
             this.actualizarMensajeA();
           }
         }
       ]
     });
 
-    await alert.present();
+    setTimeout(async () => {
+      await alert.present();
+    }, 1500);
   }
 
   // Toasts
@@ -167,7 +173,7 @@ export class AuthFacebookPage implements OnInit {
       message: 'Mensaje anónimo enviado',
       duration: 3000,
       position: 'top',
-      mode: 'md',
+      mode: 'ios',
       icon: 'paper-plane-sharp',
       cssClass: 'toast-mensaje-anonimo'
 
@@ -181,7 +187,7 @@ export class AuthFacebookPage implements OnInit {
       message: 'Redes agregadas',
       duration: 3000,
       position: 'top',
-      mode: 'md',
+      mode: 'ios',
       icon: 'checkmark-sharp',
       cssClass: 'toast-mensaje-anonimo'
 
@@ -189,12 +195,6 @@ export class AuthFacebookPage implements OnInit {
 
     await toast.present();
   }
-
-  // Popovers
-  // public async popoverNoLogin(e: Event) { 
-  //   this.popover.event = e;
-  //   this.isOpen = true;
-  // }
 }
 
 

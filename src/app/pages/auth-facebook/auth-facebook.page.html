@@ -16,25 +16,22 @@
   <ion-item class="ion-margin">
     <ion-label>Contenido:</ion-label>
     <ion-input [placeholder]="'Escribe tu mensaje aquí'" [(ngModel)]="contenidoMensajeAnonimo" [disabled]="redes"></ion-input>
-    <ion-note *ngIf="noContenido" color="danger">El Campo contenido es requerido</ion-note>
+    <ion-note *ngIf="noContenido" color="danger">Campo requerido</ion-note>
   </ion-item>
+
+  <div [ngClass]="!redes ? 'ocultar' : 'aviso-redes'" id="aviso-redes" class="aviso-redes">
+      Inicia sesión con tus redes sociales y presiona en agregar
+  </div>
 
   <div class="contenedor-redes">
 
     <input [value]="facebookUser ? facebookUser.name : ''" class="input-redes" [disabled]="true" type="text"
       [placeholder]="'Usuario de facebook'">
 
-    <ion-button id="btn-facebook" (click)="facebookLogin()" class="btn-redes" [title]="'Agregar Facebook'">
+    <ion-button (click)="facebookLogin()" class="btn-redes" [title]="'Agregar Facebook'">
       <ion-label class="label-redes">Facebook</ion-label>
       <ion-icon class="icono-redes" name="logo-facebook" slot="end"></ion-icon>
     </ion-button>
-
-    <ion-popover #popover trigger="btn-facebook" [isOpen]="isOpen" (didDismiss)="isOpen = false" [arrow]="true"
-      mode="ios">
-      <ng-template>
-        <ion-content class="ion-padding">Agrega tus redes sociales y luego preciona Agregar</ion-content>
-      </ng-template>
-    </ion-popover>
   </div>
 
   <div class="contenedor-redes">
